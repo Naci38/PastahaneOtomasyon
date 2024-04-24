@@ -1,0 +1,128 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace PastahaneOtamasyonProgrami
+{
+    public partial class Form1 : Form
+    {
+        //Data Source=17952-24381\MSSQLSERVER03;Initial Catalog=PastahaneVT;Integrated Security=True
+        SqlConnection baglanti = new SqlConnection(@"Data Source=17952-24381\MSSQLSERVER03;Initial Catalog=PastahaneVT;Integrated Security=True");
+        void MalzemeListe()
+        {
+            SqlDataAdapter da = new SqlDataAdapter("Select * From TBL_MALZEMELER",baglanti);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            dataGridView1.DataSource = dt;
+
+        }
+        void UrunListe()
+        {
+            SqlDataAdapter da2 = new SqlDataAdapter("Select * From TBL_URUNLER", baglanti);
+            DataTable dt2 = new DataTable();
+            da2.Fill(dt2);
+            dataGridView1.DataSource = dt2;
+
+        }
+        void Kasa()
+        {
+            SqlDataAdapter da3 = new SqlDataAdapter("Select * From TBL_KASA", baglanti);
+            DataTable dt3= new DataTable();
+            da3.Fill(dt3);
+            dataGridView1.DataSource = dt3;
+
+        }
+        void Urunler()
+        {
+            baglanti.Open();
+            SqlDataAdapter da = new SqlDataAdapter("Select * From TBL_URUNLER", baglanti);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            cmbUrun.ValueMember = "URUNID";
+            cmbUrun.DisplayMember = "AD";
+            cmbUrun.DataSource = dt;
+            baglanti.Close();
+        }
+        void Malzemeler()
+        {
+            baglanti.Open();
+            SqlDataAdapter da = new SqlDataAdapter("Select * From TBL_MALZEMELER", baglanti);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            cmbUrunMalzeme.ValueMember = "MALZEMEID";
+            cmbUrunMalzeme.DisplayMember = "AD";
+            cmbUrunMalzeme.DataSource = dt;
+            
+            baglanti.Close();
+        }
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // TODO: This line of code loads data into the 'pastahaneVTDataSet.TBL_MALZEMELER' table. You can move, or remove it, as needed.
+            this.tBL_MALZEMELERTableAdapter.Fill(this.pastahaneVTDataSet.TBL_MALZEMELER);
+            MalzemeListe();
+            Urunler();
+            Malzemeler();
+
+        }
+
+        private void btnUrunLıste_Click(object sender, EventArgs e)
+        {
+            UrunListe();
+        }
+
+        private void btnMalzemeLıste_Click(object sender, EventArgs e)
+        {
+            MalzemeListe();
+
+        }
+
+        private void btnKasa_Click(object sender, EventArgs e)
+        {
+            Kasa();
+        }
+
+        private void BtnMalzemeEkle_Click(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            SqlCommand komut = new SqlCommand("insert into TBL_MALZEMELER (AD,STOK,FIYAT,NOTLAR) values (@1,@2,@3,@4) ", baglanti);
+            komut.Parameters.AddWithValue("@1", txtMalzemeAd.Text);
+            komut.Parameters.AddWithValue("@2", decimal.Parse(txtMalzemeStok.Text));
+            komut.Parameters.AddWithValue("@3", decimal.Parse(txtMalzemeFiyat.Text));
+            komut.Parameters.AddWithValue("@4", txtMalzemeNotlar.Text);
+            komut.ExecuteNonQuery();
+            baglanti.Close();
+            MessageBox.Show("Malzeme Sisteme Eklendi", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MalzemeListe();
+          
+        }
+
+        private void btnUrunEkle_Click(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            SqlCommand komut = new SqlCommand("insert into TBL_URUNLER (AD) values (@1) ", baglanti);
+            komut.Parameters.AddWithValue("@1", txtUrunAd.Text);
+           
+            komut.ExecuteNonQuery();
+            baglanti.Close();
+            MessageBox.Show("Malzeme Sisteme Eklendi", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            UrunListe();
+        }
+    }
+}
